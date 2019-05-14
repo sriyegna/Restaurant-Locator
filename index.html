@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lab 2 Part B</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+	<style>
+		#loader {
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			z-index: 1;
+			width: 150px;
+			height: 150px;
+			margin: -75px 0 0 -75px;
+			border: 16px solid #f3f3f3;
+			border-radius: 50%;
+			border-top: 16px solid #3498db;
+			width: 120px;
+			height: 120px;
+			-webkit-animation: spin 2s linear infinite;
+			animation: spin 2s linear infinite;
+		}
+
+		/* Safari */
+		@-webkit-keyframes spin {
+		  0% { -webkit-transform: rotate(0deg); }
+		  100% { -webkit-transform: rotate(360deg); }
+		}
+
+		@keyframes spin {
+		  0% { transform: rotate(0deg); }
+		  100% { transform: rotate(360deg); }
+		}
+		body {
+			text-align:center;
+			}
+		#restaurantList {
+			text-align: left;
+			}
+	</style>
+  </head>
+  <body>
+		<h1>Random Restaurant</h1>
+		<h3 id="currentProgressText">Finding your location...</h3>
+		<div id="loader" class="loader"></div>
+		<ul class="list-unstyled" id="restaurantList">
+		</ul>
+	
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+	
+	
+	<script>
+	  $(document).ready( function()
+	  {
+		navigator.geolocation.getCurrentPosition(
+			function (pos) {				
+				var getAddress = "https://csunix.mohawkcollege.ca/tooltime/10133/2019/api/api.php";
+				var apiResult;
+				$.get(
+					getAddress,
+					{
+						lat: pos.coords.latitude,
+						long: pos.coords.longitude
+					},
+					function(data)
+					{
+						$("#loader").hide();
+						apiResult = JSON.parse(data).businesses;
+						$("#currentProgressText").html("Found these restaurants...");
+						
+						for (i = 0; i < apiResult.length; i++) {
+							var htmlOutput = "<li class='media'><div class='media-left'><img src=" + apiResult[i].image_url + " class='media-object' style='width:100px;height:100px;'></div><div class='media-body'><h4 class='media-heading'>" + apiResult[i].name + "</h4><h6>";
+							for (j = 0; j < apiResult[i].categories.length; j++) {
+								if (j > 0) {
+									htmlOutput += ", ";
+								}
+								htmlOutput += apiResult[i].categories[j].title;
+							}
+							htmlOutput += "<br>";
+							for (k = 0; k < apiResult[i].location.display_address.length; k++) {
+								if (k > 0) {
+									htmlOutput += ", ";
+								}
+								htmlOutput += apiResult[i].location.display_address[k];
+							}
+							htmlOutput += "<br>" + apiResult[i].display_phone + "<br>";
+							
+							var yelpRating = apiResult[i].rating;
+							var imgPath;
+							if (yelpRating == "0") {
+								imgPath = "small_0.png";
+							} else if (yelpRating == "1") {
+								imgPath = "small_1.png";
+							} else if (yelpRating == "1.5") {
+								imgPath = "small_1_half.png";
+							} else if (yelpRating == "2") {
+								imgPath = "small_2.png";
+							} else if (yelpRating == "2.5") {
+								imgPath = "small_2_half.png";
+							} else if (yelpRating == "3") {
+								imgPath = "small_3.png";
+							} else if (yelpRating == "3.5") {
+								imgPath = "small_3_half.png";
+							} else if (yelpRating == "4") {
+								imgPath = "small_4.png";
+							} else if (yelpRating == "4.5") {
+								imgPath = "small_4_half.png";
+							} else if (yelpRating == "5") {
+								imgPath = "small_5.png";
+							}
+							
+							htmlOutput += "<img src='web_and_ios/small/" + imgPath + "'> " + apiResult[i].review_count + " Reviews";
+							htmlOutput += "</h6></div></li>";
+							$("#restaurantList").append(htmlOutput);
+						}
+					}
+				);
+			});
+	  });
+	</script>
+  </body>
+</html>
